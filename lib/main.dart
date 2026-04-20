@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:todo_app/data/todo_repository.dart';
 import 'package:todo_app/models/todo.dart';
 import 'package:todo_app/viewmodels/todo_viewmodel.dart';
+import 'package:todo_app/widgets/todo_input.dart';
+import 'package:todo_app/widgets/todo_list.dart';
 
 void main() {
   sqfliteFfiInit();
@@ -66,97 +68,34 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(title: Text(widget.title)),
       body: Column(
         children: [
-          TextField(
+          TodoInput(
             controller: controller,
-            decoration: InputDecoration(labelText: 'New task'),
-          ),
-          Expanded(
-            child: todos.isEmpty
-                ? Center(
-                    child: Text(
-                      'No tasks',
-                      style: TextStyle(fontSize: 18, color: Colors.grey),
-                    ),
-                  )
-                : ListView.builder(
-                    itemCount: todos.length,
-                    itemBuilder: (context, index) {
-                      final todo = todos[index];
-
-                      return Dismissible(
-                        key: ValueKey(todo.id),
-                        direction: DismissDirection.endToStart,
-                        resizeDuration: Duration(milliseconds: 300),
-
-                        background: Container(
-                          color: Colors.red,
-                          alignment: Alignment.centerRight,
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: Icon(Icons.delete, color: Colors.white),
-                        ),
-                        onDismissed: (_) {
-                          viewModel.deleteTodoWithUndo(todo);
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Task deleted'),
-                              action: SnackBarAction(
-                                label: 'Cancel',
-                                onPressed: () {
-                                  viewModel.undoDelete();
-                                },
-                              ),
-                              duration: Duration(seconds: 3),
-                            ),
-                          );
-                        },
-                        child: AnimatedSwitcher(
-                          duration: Duration(milliseconds: 300),
-                          transitionBuilder: (child, animation) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: SlideTransition(
-                                position: Tween(
-                                  begin: Offset(0, 0.2),
-                                  end: Offset.zero,
-                                ).animate(animation),
-                                child: child,
-                              ),
-                            );
-                          },
-                          child: ListTile(
-                            title: AnimatedDefaultTextStyle(
-                              duration: Duration(milliseconds: 300),
-                              style: TextStyle(
-                                decoration: todo.isDone
-                                    ? TextDecoration.lineThrough
-                                    : null,
-                                color: todo.isDone ? Colors.grey : Colors.black,
-                              ),
-                              child: Text(todo.title),
-                            ),
-                            trailing: AnimatedSwitcher(
-                              duration: Duration(milliseconds: 200),
-                              child: Checkbox(
-                                value: todo.isDone,
-                                onChanged: (_) {
-                                  viewModel.toggleTodo(todo);
-                                },
-                              ),
-                            ),
-                            onTap: () => viewModel.toggleTodo(todo),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-          ),
-          ElevatedButton(
-            onPressed: () {
+            onAdd: () {
               viewModel.addTodo(controller.text);
               controller.clear();
             },
-            child: Text('Add'),
+          ),
+
+          Expanded(
+            child: TodoList(
+              todos: todos,
+              onToggle: viewModel.toggleTodo,
+              onDelete: (todo) {
+                viewModel.deleteTodoWithUndo(todo);
+
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text('Task deleted'),
+                      action: SnackBarAction(
+                        label: 'Undo',
+                        onPressed: viewModel.undoDelete,
+                      ),
+                    ),
+                  );
+              },
+            ),
           ),
         ],
       ),
