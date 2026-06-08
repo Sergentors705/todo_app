@@ -1,7 +1,8 @@
 import 'package:todo_app/data/database_helper.dart';
+import 'package:todo_app/domain/repositories/i_todo_repository.dart';
 import 'package:todo_app/models/todo.dart';
 
-class TodoRepository {
+class TodoRepository implements ITodoRepository {
   final dbHelper = DatabaseHelper.instance;
 
   Future<List<Todo>> getTodos() async {
@@ -15,14 +16,14 @@ class TodoRepository {
     return await db.insert('todos', todo.toMap());
   }
 
-  Future<void> updateTodo(int id, int isDone) async {
+  Future<void> updateTodo(Todo todo) async {
     final db = await dbHelper.database;
 
     await db.update(
       'todos',
-      {'isDone': isDone},
+      todo.toMap(),
       where: 'id = ?',
-      whereArgs: [id],
+      whereArgs: [todo.id],
     );
   }
 

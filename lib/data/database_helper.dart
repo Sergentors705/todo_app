@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -25,14 +23,22 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         await db.execute('''
-  CREATE TABLE todos(
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  title TEXT,
-  isDone INTEGER DEFAULT 0
-  )''');
+          CREATE TABLE todos(
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          title TEXT,
+          isDone INTEGER DEFAULT 0,
+          priority INTEGER DEFAULT 1
+          )''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute(
+            'ALTER TABLE todos ADD COLUMN priority INTEGER DEFAULT 1',
+          );
+        }
       },
     );
   }
