@@ -100,14 +100,20 @@ class TodoViewModel extends ChangeNotifier {
 
   Future<void> toggleTodo(Todo todo) async {
     final oldValue = todo.isDone;
+    final updatedTodo = todo.copyWith(isDone: !todo.isDone);
 
-    todo.isDone = !todo.isDone;
+    _todos = _todos.map((t) {
+      if (t.id == todo.id) {
+        return updatedTodo;
+      }
+      return t;
+    }).toList();
     notifyListeners();
 
     try {
-      await toggleTodoUseCase(todo);
+      await toggleTodoUseCase(updatedTodo);
     } catch (e) {
-      todo.isDone = oldValue;
+      todo = todo.copyWith(isDone: oldValue);
       notifyListeners();
     }
   }
@@ -154,14 +160,17 @@ class TodoViewModel extends ChangeNotifier {
   }
 
   Future<void> changePriorityTodo(Todo todo) async {
-    final oldPriority = todo.priority;
-
     try {
-      await changePriorityUseCase(todo);
+      final updatedTodo = await changePriorityUseCase(todo);
+      _todos = _todos.map((t) {
+        if (t.id == todo.id) {
+          return updatedTodo;
+        }
+        return t;
+      }).toList();
       notifyListeners();
     } catch (e) {
-      todo.priority = oldPriority;
-      notifyListeners();
+      // notifyListeners();
     }
   }
 }

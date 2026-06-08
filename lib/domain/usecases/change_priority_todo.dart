@@ -6,19 +6,22 @@ class ChangePriorityUseCase {
 
   ChangePriorityUseCase(this.repository);
 
-  Future<void> call(Todo todo) async {
+  Future<Todo> call(Todo todo) async {
+    Todo updatedTodo;
+
     switch (todo.priority) {
       case Priority.low:
-        todo.priority = Priority.medium;
+        updatedTodo = todo.copyWith(priority: Priority.medium);
         break;
       case Priority.medium:
-        todo.priority = Priority.high;
+        updatedTodo = todo.copyWith(priority: Priority.high);
         break;
       case Priority.high:
-        todo.priority = Priority.low;
+        updatedTodo = todo.copyWith(priority: Priority.low);
         break;
     }
 
-    await repository.updateTodo(todo);
+    await repository.updateTodo(updatedTodo);
+    return updatedTodo;
   }
 }
