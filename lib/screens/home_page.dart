@@ -78,6 +78,21 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
 
+          // SORT
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              TextButton(
+                onPressed: () => viewModel.setSort(TodoSort.none),
+                child: Text('None'),
+              ),
+              TextButton(
+                onPressed: () => viewModel.setSort(TodoSort.priority),
+                child: Text('Priority'),
+              ),
+            ],
+          ),
+
           Expanded(
             child: Consumer<TodoViewModel>(
               builder: (context, viewModel, _) {

@@ -8,6 +8,8 @@ import 'package:todo_app/models/todo.dart';
 
 enum TodoFilter { all, active, completed }
 
+enum TodoSort { none, priority }
+
 class TodoViewModel extends ChangeNotifier {
   final ITodoRepository repository;
   final AddTodoUseCase addTodoUseCase;
@@ -34,11 +36,16 @@ class TodoViewModel extends ChangeNotifier {
   );
 
   TodoFilter _filter = TodoFilter.all;
-
   TodoFilter get filter => _filter;
-
   void setFilter(TodoFilter filter) {
     _filter = filter;
+    notifyListeners();
+  }
+
+  TodoSort _sort = TodoSort.none;
+  TodoSort get sort => _sort;
+  void setSort(TodoSort sort) {
+    _sort = sort;
     notifyListeners();
   }
 
@@ -56,7 +63,7 @@ class TodoViewModel extends ChangeNotifier {
         break;
 
       case TodoFilter.all:
-        result = _todos;
+        result = [..._todos];
         break;
     }
 
@@ -65,6 +72,15 @@ class TodoViewModel extends ChangeNotifier {
       result = result.where((t) {
         return t.title.toLowerCase().contains(_searchQuery.toLowerCase());
       }).toList();
+    }
+
+    // SORT
+    switch (_sort) {
+      case TodoSort.priority:
+        result.sort((a, b) => b.priority.index.compareTo(a.priority.index));
+        break;
+      case TodoSort.none:
+        break;
     }
     return result;
   }
