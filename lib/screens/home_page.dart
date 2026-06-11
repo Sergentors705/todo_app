@@ -117,6 +117,34 @@ class _MyHomePageState extends State<MyHomePage> {
                       );
                   },
                   onChangePriority: viewModel.changePriorityTodo,
+                  onEdit: (todo) {
+                    final controller = TextEditingController(text: todo.title);
+
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text('Edit task'),
+                          content: TextField(controller: controller),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                await viewModel.editTodo(todo, controller.text);
+                                Navigator.pop(context);
+                              },
+                              child: Text('Save'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
                 );
               },
             ),

@@ -3,6 +3,7 @@ import 'package:todo_app/domain/repositories/i_todo_repository.dart';
 import 'package:todo_app/domain/usecases/add_todo.dart';
 import 'package:todo_app/domain/usecases/change_priority_todo.dart';
 import 'package:todo_app/domain/usecases/delete_todo.dart';
+import 'package:todo_app/domain/usecases/edit_todo.dart';
 import 'package:todo_app/domain/usecases/toggle_todo.dart';
 import 'package:todo_app/models/todo.dart';
 
@@ -16,6 +17,7 @@ class TodoViewModel extends ChangeNotifier {
   final ToggleTodoUseCase toggleTodoUseCase;
   final DeleteTodoUseCase deleteTodoUseCase;
   final ChangePriorityUseCase changePriorityUseCase;
+  final EditTodoUseCase editTodoUseCase;
 
   final Map<int, Todo> _pendingDeletes = {};
 
@@ -33,6 +35,7 @@ class TodoViewModel extends ChangeNotifier {
     this.toggleTodoUseCase,
     this.deleteTodoUseCase,
     this.changePriorityUseCase,
+    this.editTodoUseCase,
   );
 
   TodoFilter _filter = TodoFilter.all;
@@ -90,6 +93,7 @@ class TodoViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // LOAD
   Future<void> loadTodos() async {
     _todos = await repository.getTodos();
     for (final todo in _todos) {
@@ -98,6 +102,7 @@ class TodoViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ADD
   Future<void> addTodo(String title) async {
     if (title.trim().isEmpty) return;
 
@@ -114,6 +119,7 @@ class TodoViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // TOGGLE
   Future<void> toggleTodo(Todo todo) async {
     final oldValue = todo.isDone;
     final updatedTodo = todo.copyWith(isDone: !todo.isDone);
@@ -134,6 +140,7 @@ class TodoViewModel extends ChangeNotifier {
     }
   }
 
+  // DELETE
   Future<void> deleteTodo(Todo todo) async {
     final oldTodos = _todos;
 
@@ -148,6 +155,7 @@ class TodoViewModel extends ChangeNotifier {
     }
   }
 
+  // DELETE WITH UNDO
   Future<void> deleteTodoWithUndo(Todo todo) async {
     _pendingDeletes[todo.id!] = todo;
 
@@ -175,6 +183,7 @@ class TodoViewModel extends ChangeNotifier {
     _pendingDeletes.remove(id);
   }
 
+  // PRIORITY
   Future<void> changePriorityTodo(Todo todo) async {
     try {
       final updatedTodo = await changePriorityUseCase(todo);
@@ -187,6 +196,24 @@ class TodoViewModel extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       // notifyListeners();
+    }
+  }
+
+  // EDIT
+  Future<void> editTodo(Todo todo, String newTitle) async {
+    try {
+      final updatedTodo = await editTodoUseCase(todo, newTitle);
+
+      _todos = _todos.map((t) {
+        if (t.id == todo.id) {
+          return updatedTodo;
+        }
+        return t;
+      }).toList();
+
+      notifyListeners();
+    } catch (e) {
+      print(e);
     }
   }
 }

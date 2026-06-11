@@ -7,6 +7,7 @@ class TodoList extends StatelessWidget {
   final Function(Todo) onToggle;
   final Function(Todo) onDelete;
   final Function(Todo) onChangePriority;
+  final Function(Todo) onEdit;
 
   const TodoList({
     super.key,
@@ -14,6 +15,7 @@ class TodoList extends StatelessWidget {
     required this.onToggle,
     required this.onDelete,
     required this.onChangePriority,
+    required this.onEdit,
   });
 
   @override
@@ -31,6 +33,7 @@ class TodoList extends StatelessWidget {
           onToggle: () => onToggle(todo),
           onDelete: () => onDelete(todo),
           onChangePriority: () => onChangePriority(todo),
+          onEdit: () => onEdit(todo),
         );
       },
     );

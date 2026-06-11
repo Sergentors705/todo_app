@@ -5,6 +5,7 @@ import 'package:todo_app/data/todo_repository.dart';
 import 'package:todo_app/domain/usecases/add_todo.dart';
 import 'package:todo_app/domain/usecases/change_priority_todo.dart';
 import 'package:todo_app/domain/usecases/delete_todo.dart';
+import 'package:todo_app/domain/usecases/edit_todo.dart';
 import 'package:todo_app/domain/usecases/toggle_todo.dart';
 import 'package:todo_app/screens/home_page.dart';
 import 'package:todo_app/viewmodels/todo_viewmodel.dart';
@@ -31,6 +32,9 @@ void main() {
           create: (context) =>
               ChangePriorityUseCase(context.read<TodoRepository>()),
         ),
+        Provider(
+          create: (context) => EditTodoUseCase(context.read<TodoRepository>()),
+        ),
         ChangeNotifierProvider(
           create: (context) => TodoViewModel(
             context.read<TodoRepository>(),
@@ -38,6 +42,7 @@ void main() {
             context.read<ToggleTodoUseCase>(),
             context.read<DeleteTodoUseCase>(),
             context.read<ChangePriorityUseCase>(),
+            context.read<EditTodoUseCase>(),
           ),
         ),
       ],

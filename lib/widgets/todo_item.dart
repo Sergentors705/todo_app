@@ -3,11 +3,14 @@ import 'package:provider/provider.dart';
 import 'package:todo_app/models/todo.dart';
 import 'package:todo_app/viewmodels/todo_viewmodel.dart';
 
+enum TodoAction { edit, priority, delete }
+
 class TodoItem extends StatelessWidget {
   final Todo todo;
   final VoidCallback onToggle;
   final VoidCallback onDelete;
   final VoidCallback onChangePriority;
+  final VoidCallback onEdit;
 
   const TodoItem({
     super.key,
@@ -15,6 +18,7 @@ class TodoItem extends StatelessWidget {
     required this.onToggle,
     required this.onDelete,
     required this.onChangePriority,
+    required this.onEdit,
   });
 
   @override
@@ -41,7 +45,6 @@ class TodoItem extends StatelessWidget {
             final todo = this.todo;
             return ListTile(
               onTap: onToggle,
-              onLongPress: onChangePriority,
               key: ValueKey(todo.id),
               title: AnimatedDefaultTextStyle(
                 duration: Duration(milliseconds: 300),
@@ -53,13 +56,42 @@ class TodoItem extends StatelessWidget {
                 child: Text(todo.title),
               ),
               subtitle: Text('Priority: ${todo.priority.name}'),
-              trailing: AnimatedSwitcher(
+              leading: AnimatedSwitcher(
                 duration: Duration(milliseconds: 200),
                 child: Checkbox(
                   key: ValueKey(todo.isDone),
                   value: todo.isDone,
                   onChanged: (_) => onToggle(),
                 ),
+              ),
+              trailing: PopupMenuButton<TodoAction>(
+                onSelected: (value) {
+                  switch (value) {
+                    case TodoAction.priority:
+                      onChangePriority();
+                      break;
+                    case TodoAction.delete:
+                      onDelete();
+                      break;
+                    case TodoAction.edit:
+                      onEdit();
+                      break;
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: TodoAction.edit,
+                    child: Text('Edit title'),
+                  ),
+                  PopupMenuItem(
+                    value: TodoAction.priority,
+                    child: Text('Edit priority'),
+                  ),
+                  PopupMenuItem(
+                    value: TodoAction.delete,
+                    child: Text('Delete'),
+                  ),
+                ],
               ),
             );
           },
