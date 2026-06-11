@@ -52,6 +52,17 @@ class TodoViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void _replaceTodo(Todo updatedTodo) {
+    _todos = _todos.map((t) {
+      if (t.id == updatedTodo.id) {
+        return updatedTodo;
+      }
+      return t;
+    }).toList();
+    notifyListeners();
+  }
+
+  // FILTER
   List<Todo> get filteredTodos {
     List<Todo> result;
 
@@ -96,9 +107,6 @@ class TodoViewModel extends ChangeNotifier {
   // LOAD
   Future<void> loadTodos() async {
     _todos = await repository.getTodos();
-    for (final todo in _todos) {
-      print('${todo.title} | ${todo.priority}');
-    }
     notifyListeners();
   }
 
@@ -124,13 +132,7 @@ class TodoViewModel extends ChangeNotifier {
     final oldValue = todo.isDone;
     final updatedTodo = todo.copyWith(isDone: !todo.isDone);
 
-    _todos = _todos.map((t) {
-      if (t.id == todo.id) {
-        return updatedTodo;
-      }
-      return t;
-    }).toList();
-    notifyListeners();
+    _replaceTodo(updatedTodo);
 
     try {
       await toggleTodoUseCase(updatedTodo);
@@ -187,13 +189,7 @@ class TodoViewModel extends ChangeNotifier {
   Future<void> changePriorityTodo(Todo todo) async {
     try {
       final updatedTodo = await changePriorityUseCase(todo);
-      _todos = _todos.map((t) {
-        if (t.id == todo.id) {
-          return updatedTodo;
-        }
-        return t;
-      }).toList();
-      notifyListeners();
+      _replaceTodo(updatedTodo);
     } catch (e) {
       // notifyListeners();
     }
@@ -203,14 +199,7 @@ class TodoViewModel extends ChangeNotifier {
   Future<void> editTodo(Todo todo, String newTitle) async {
     try {
       final updatedTodo = await editTodoUseCase(todo, newTitle);
-
-      _todos = _todos.map((t) {
-        if (t.id == todo.id) {
-          return updatedTodo;
-        }
-        return t;
-      }).toList();
-
+      _replaceTodo(updatedTodo);
       notifyListeners();
     } catch (e) {
       print(e);
