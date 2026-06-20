@@ -6,7 +6,9 @@ class ToggleTodoUseCase {
 
   ToggleTodoUseCase(this.repository);
 
-  Future<void> call(Todo todo) async {
-    await repository.updateTodo(todo);
+  Future<Todo> call(Todo todo) async {
+    final updatedTodo = todo.copyWith(isDone: !todo.isDone);
+    await repository.updateTodo(updatedTodo);
+    return updatedTodo;
   }
 }

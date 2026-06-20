@@ -129,16 +129,11 @@ class TodoViewModel extends ChangeNotifier {
 
   // TOGGLE
   Future<void> toggleTodo(Todo todo) async {
-    final oldValue = todo.isDone;
-    final updatedTodo = todo.copyWith(isDone: !todo.isDone);
-
-    _replaceTodo(updatedTodo);
-
     try {
-      await toggleTodoUseCase(updatedTodo);
+      final updatedTodo = await toggleTodoUseCase(todo);
+      _replaceTodo(updatedTodo);
     } catch (e) {
-      todo = todo.copyWith(isDone: oldValue);
-      notifyListeners();
+      print(e);
     }
   }
 
