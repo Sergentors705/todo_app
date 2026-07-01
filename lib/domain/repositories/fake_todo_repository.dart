@@ -2,6 +2,7 @@ import 'package:todo_app/domain/repositories/i_todo_repository.dart';
 import 'package:todo_app/models/todo.dart';
 
 class FakeTodoRepository implements ITodoRepository {
+  List<Todo> todos = [];
   Todo? updatedTodo;
 
   @override
@@ -19,6 +20,6 @@ class FakeTodoRepository implements ITodoRepository {
 
   @override
   Future<List<Todo>> getTodos() async {
-    return [];
+    return todos;
   }
 }

@@ -24,4 +24,18 @@ void main() {
     expect(result.priority, Priority.high);
     expect(repository.updatedTodo?.priority, Priority.high);
   });
+
+  // test('toggle todo false -> true', () async {
+  //   final repository = FakeTodoRepository();
+  //   final useCase = ToggleTodoUseCase(repository);
+  //   final todo = [
+  //     Todo(id: 1, title: 'Task 1', isDone: false, priority: Priority.medium),
+  //     Todo(id: 2, title: 'Task 2', isDone: true, priority: Priority.medium),
+  //   ];
+
+  //   final result = await useCase(todo[1]);
+
+  //   expect(result.isDone, true);
+  //   expect(repository.updatedTodo?.isDone, true);
+  // });
 }
